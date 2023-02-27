@@ -49,7 +49,7 @@ def checkerboard(w, h, sw, sh=None):
 
     return mask_image
 
-image = checkerboard(w, h, SW, SH)
+image = checkerboard(w, h, font_size, font_size)
 
 PIL.Image.fromarray(image).save(f"public/{n}")
 

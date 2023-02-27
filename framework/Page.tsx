@@ -20,7 +20,7 @@ export default function Page({
         height: '100vh',
         margin: 0,
         padding: 0,
-        display: 'inline-block',
+        overflow: 'auto',
     }, ...style}}>
         {children}
     </div>

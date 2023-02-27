@@ -1,26 +1,21 @@
-import {useRouter} from 'next/router'
-
 import Page from '@/framework/Page'
-import Billboard from '@/framework/Billboard'
-import HStack from '@/framework/HStack'
+import Navbar from '@/framework/Navbar'
 
-import defaultTheme from '@/themes/default'
-
-export default function Home() {
-
-  let router = useRouter()
-
-  return <Page>
-    <Billboard>
-      <h1>InsightDB</h1>
-      <i>Data Storage with <strong>Purpose</strong></i>
-      <HStack>
-        <button style={{
-          marginRight: defaultTheme.spacing.sm
-        }} onClick={()=>router.push("/signin")}>Sign In</button>
-        <button onClick={()=>router.push("/signup")}>Sign Up</button>
-      </HStack>
-    </Billboard>
-
-  </Page>
+export default function Home(){
+    return <Page>
+        <Navbar>
+            <Navbar.Logo src="/logo.png" width={64} height={64} />
+            <Navbar.Item>
+                <h1>InsightDB</h1>
+            </Navbar.Item>
+            <Navbar.AlignRight>
+                <Navbar.AlignRight.Item>
+                <button>Sign In</button>
+                </Navbar.AlignRight.Item>
+                <Navbar.AlignRight.Item>
+                <button>Sign Up</button>
+                </Navbar.AlignRight.Item>
+            </Navbar.AlignRight>
+        </Navbar>
+    </Page>
 }

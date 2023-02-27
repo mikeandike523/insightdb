@@ -1,8 +1,6 @@
 import {useState} from 'react'
 
 import Page from '@/framework/Page'
-import Billboard from '@/framework/Billboard'
-import VStack from '@/framework/VStack'
 
 import theme from '@/themes/default'
 
@@ -48,26 +46,24 @@ export default function Neo4JConsole(){
         }
     }
 
-
     return <Page>
-                <VStack>
-                    <h1>Neo4J Console</h1>
-                    <div>Query:</div>
-                    <textarea rows={20} cols={80} onChange={(e)=>{
-                        setQuery(e.target.value)
-                    }}></textarea>
-                    <div>Params:</div>
-                    <textarea defaultValue={paramsAsString} rows={20} cols={80} onChange={(e)=>{
-                        setParamsAsString(e.target.value)
-                    }}></textarea>
-                    <div>
-                        <button onClick={handleRead} style={{
-                            marginRight: theme.spacing.sm
-                        }}>Read</button>
-                        <button onClick={handleWrite}>Write</button>
-                    </div>
-                    <textarea rows={20} cols={80} disabled value={response}></textarea>
-                </VStack>
-        </Page>
+                <h1>Neo4J Console</h1>
+                <div>Query:</div>
+                <textarea rows={20} cols={80} onChange={(e)=>{
+                    setQuery(e.target.value)
+                }}></textarea>
+                <div>Params:</div>
+                <textarea defaultValue={paramsAsString} rows={20} cols={80} onChange={(e)=>{
+                    setParamsAsString(e.target.value)
+                }}></textarea>
+                <div>
+                    <button onClick={handleRead} style={{
+                        marginRight: theme.spacing.sm
+                    }}>Read</button>
+                    <button onClick={handleWrite}>Write</button>
+                </div>
+                <textarea rows={20} cols={80} disabled value={response}></textarea>
+            </Page>
+
 
 }
