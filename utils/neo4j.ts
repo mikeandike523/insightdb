@@ -59,7 +59,7 @@ export async function write(cypher: string, params = {}): Promise<SerializableOb
 }
 
 export function responseToObject(res: any): object {
-  return (res.records??[]).map((record: any) => record.toObject())
+  return res.records.map((record: any) => record.toObject())
 }
 
 export function responseToSerializableObject(res: any): SerializableObject {
@@ -109,12 +109,16 @@ export class Connection {
     try{
 
       let transaction = (mode === "write") ? session.executeWrite(async (tx)=>{
-         return await procedure(new WrappedTx(tx))
+         let result = await procedure(new WrappedTx(tx))
+        return result
       }) : session.executeRead(async (tx)=>{
         return await procedure(new WrappedTx(tx))
       })
+
+      let result = await transaction
       
-      return toSerializableObject(responseToObject(await transaction))
+      return result as SerializableObject
+
     }
     finally{
       await session.close()

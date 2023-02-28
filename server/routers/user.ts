@@ -5,17 +5,16 @@ import bcrypt from 'bcryptjs'
 import { procedure, router } from '../trpc'
 
 import {Connection, WrappedTx, type Procedure} from '@/utils/neo4j'
-import { SerializableObject } from '@/types/SerializableObject'
+import { SerializableObject, toSerializableObject } from '@/types/SerializableObject'
 import normalizeEmail from '@/utils/normalizeEmail'
+import UserFacingError from '@/types/UserFacingError'
+
+
+import { FormSchema } from '@/pages/signup'
 
 export const userRouter = router({
-    create: procedure.input(z.object({
-        email:z.string().min(1).email(),
-        name:z.string().min(1),
-        organization:z.string().min(1),
-        password:z.string().min(1)
-    })).mutation(async ({input})=>{
-
+    create: procedure.input(FormSchema).mutation(async ({input})=>{
+        
         let SALT_LENGTH = process.env.SALT_LENGTH ? parseInt(process.env.SALT_LENGTH, 10) : 12
 
         let passwordHash = bcrypt.hashSync(input.password, SALT_LENGTH)
@@ -36,21 +35,23 @@ export const userRouter = router({
             }) as Array<SerializableObject>
 
             if(findUsersResult.length > 0){
-                throw new Error('A user already exists with the given email.')
+                return new UserFacingError('A user already exists with the given email.')
             }
 
             let createUserResult: Array<SerializableObject> = await tx.run(`
                 CREATE (user:PrincipalUser {
-                    email: $email, 
+                    email: $email,
+                    title: $title, 
                     name: $name, 
-                    organization: $organization, 
+                    orgName: $orgName, 
                     password: $password
                 })
                 RETURN user
             `, {
                 email: input.email,
+                title: input.title ?? null,
                 name: input.name,
-                organization: input.organization,
+                orgName: input.orgName,
                 password: passwordHash
             }) as Array<SerializableObject>
 
@@ -58,11 +59,9 @@ export const userRouter = router({
 
         }
 
-        let result: Array<SerializableObject> = await connection.withWriter(procedure) as Array<SerializableObject>
+        let result: Array<SerializableObject> | UserFacingError = await connection.withWriter(procedure) as Array<SerializableObject> | UserFacingError
 
-        console.log(result)
-
-        return result
+        return toSerializableObject(result)
 
     })
 })

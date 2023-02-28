@@ -14,6 +14,12 @@ const theme: any = {
         },
         "border":{
             "light": "rgb(19, 89, 19)",
+        },
+        "context":{
+            "text":{
+                "primary": "rgb(255, 255, 255)",
+            },
+            "primary":"rgb(10, 90, 160)"
         }
     }
 }

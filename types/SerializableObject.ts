@@ -42,7 +42,10 @@ export function toSerializableObject(obj: any, _references?: any[]): Serializabl
 
     }else{  
         let result: SerializableObject = {}
-        for(let key in obj){
+        let keys = Object.getOwnPropertyNames(obj)
+        for(let keyIdx = 0; keyIdx < keys.length; keyIdx++){
+        
+            let key = keys[keyIdx]
 
             if(typeof obj[key] === "undefined"){
                 continue

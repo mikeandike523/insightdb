@@ -1,7 +1,5 @@
 import {useState} from 'react'
 
-import Page from '@/framework/Page'
-
 import theme from '@/themes/default'
 
 import {clientWrite as n4j_write, clientRead as n4j_read, responseToSerializableObject} from '@/utils/neo4j'
@@ -24,7 +22,6 @@ export default function Neo4JConsole(){
         try{
             setResponse("")
             const result = await n4j_write(query, JSON.parse(paramsAsString))
-            console.log(result)
             setResponse("Success:\n"+JSON.stringify(result, null, 2))
         }catch(e: unknown){
             if(e instanceof Error){
@@ -37,7 +34,6 @@ export default function Neo4JConsole(){
         try{
             setResponse("")
             const result = await n4j_read(query, JSON.parse(paramsAsString))
-            console.log(result)
             setResponse(JSON.stringify(result, null, 2))
         }catch(e: unknown){
             if(e instanceof Error){
@@ -46,7 +42,7 @@ export default function Neo4JConsole(){
         }
     }
 
-    return <Page>
+    return <>
                 <h1>Neo4J Console</h1>
                 <div>Query:</div>
                 <textarea rows={20} cols={80} onChange={(e)=>{
@@ -63,7 +59,7 @@ export default function Neo4JConsole(){
                     <button onClick={handleWrite}>Write</button>
                 </div>
                 <textarea rows={20} cols={80} disabled value={response}></textarea>
-            </Page>
+            </>
 
 
 }

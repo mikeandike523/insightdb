@@ -56,20 +56,27 @@ export function GlobalStateProvider({
 
     let [hydrated, setHydrated] = useState(false)
 
-    useEffect(()=>{
-        if(typeof window !== "undefined"){
-            if(window.sessionStorage.getItem("globalStateAsString")){
-                setStateAsString(window.sessionStorage.getItem("globalStateAsString")??"{}")
-            }
-            setHydrated(true)
-        }
-    },[typeof window !== "undefined"])
+    // useEffect(()=>{
+    //     if(typeof window !== "undefined"){
+    //         if(window.sessionStorage.getItem("globalStateAsString")){
+    //             setStateAsString(window.sessionStorage.getItem("globalStateAsString")??"{}")
+    //         }
+    //         setHydrated(true)
+    //     }
+    // },[typeof window !== "undefined"])
 
-    return hydrated?<GlobalContext.Provider value={[stateAsString, setStateAsString]}>
+    // return hydrated?<GlobalContext.Provider value={[stateAsString, setStateAsString]}>
+    //     <>
+    //         {children}
+    //     </>
+    // </GlobalContext.Provider>:<>{defaultComponent}</>
+
+    return <GlobalContext.Provider value={[stateAsString, setStateAsString]}>
         <>
             {children}
         </>
-    </GlobalContext.Provider>:<>{defaultComponent}</>
+    </GlobalContext.Provider>
+
 }
 
 export function useGlobalState() : StateManager {
