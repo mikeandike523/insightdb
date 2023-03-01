@@ -19,15 +19,12 @@ import { useControlledInput } from "@/components/ControlledInput";
 
 import { toSerializableObject } from "@/types/SerializableObject";
 import UserFacingError from "@/types/UserFacingError";
+import { useGlobalState } from "@/utils/GlobalState";
 
-import { trpc } from "@/utils/trpc";
 import { TRPCClientError } from "@trpc/client";
 
 const FormSchema = z.object({
   email: z.string().min(1).email(),
-  title: z.string().min(1).optional(),
-  name: z.string().min(1),
-  orgName: z.string().min(1),
   password: z.string().min(1),
 });
 
@@ -35,8 +32,10 @@ export { FormSchema };
 
 export type FormValues = z.infer<typeof FormSchema>;
 
-export default function Signup() {
-  const createUserMutation = trpc.user.create.useMutation();
+export default function Signin() {
+  const globalState = useGlobalState;
+
+  //let userAuthMutation = trpc.user.auth.useMutation()
 
   const router = useRouter();
 
@@ -48,32 +47,6 @@ export default function Signup() {
     "Email Address",
     true,
     "email",
-    "",
-    { m: 1 }
-  );
-
-  const [titleComponent, title] = useControlledInput(
-    "Title",
-    false,
-    "text",
-    "",
-    {
-      m: 1,
-    }
-  );
-
-  const [nameComponent, name] = useControlledInput(
-    "Full Name",
-    true,
-    "text",
-    "",
-    { m: 1 }
-  );
-
-  const [orgNameComponent, orgName] = useControlledInput(
-    "Organization Name",
-    true,
-    "text",
     "",
     { m: 1 }
   );
@@ -94,17 +67,15 @@ export default function Signup() {
 
       const parsed = FormSchema.parse({
         email,
-        title,
-        name,
-        orgName,
         password,
       });
 
-      const response = await createUserMutation.mutateAsync(parsed);
+      // let response = await userAuthMutation.mutateAsync(parsed)
 
-      if (UserFacingError.is(response)) {
-        throw response;
-      }
+      // if(UserFacingError.is(response))
+      // {
+      //     throw response
+      // }
 
       setSuccess(true);
     } catch (e: any) {
@@ -195,12 +166,9 @@ export default function Signup() {
         >
           <Stack direction="column" alignItems="center">
             <Typography variant="h4" component="h1">
-              Sign Up
+              Sign In
             </Typography>
             {emailComponent}
-            {titleComponent}
-            {nameComponent}
-            {orgNameComponent}
             {passwordComponent}
             <Button variant="contained" color="primary" onClick={handleSubmit}>
               Submit
@@ -214,19 +182,7 @@ export default function Signup() {
                 </ul>
               </Alert>
             )}
-            {success && (
-              <Alert severity="success">
-                Signup Successful&nbsp;
-                <Button
-                  variant="text"
-                  onClick={() => {
-                    router.push("/signin");
-                  }}
-                >
-                  Sign In
-                </Button>
-              </Alert>
-            )}
+            {success && <Alert severity="success">Signin Successful</Alert>}
           </Stack>
         </Box>
       </Container>

@@ -9,6 +9,14 @@
 		"editor.fontLigatures": true,
 		"editor.wordWrap":"wordWrapColumn",
 		"editor.wordWrapColumn":80, 
-		"editor.rulers":[80]
+		"editor.rulers":[80],
+		"editor.detectIndentation": false,
+		"editor.tabSize":2,
+		"editor.insertSpaces": true,
+		"editor.codeActionsOnSave": {
+			"source.fixAll.eslint": true,
+			"source.organizeImports": true
+		},
+    "eslint.format.enable": true,
 	}
 }
