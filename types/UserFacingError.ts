@@ -1,15 +1,25 @@
+import { TRPCError } from '@trpc/server';
+import { SerializableObject, toSerializableObject } from './SerializableObject';
+
 export default class UserFacingError extends Error {
-  constructor(message: string) {
-    super(message);
-    return UserFacingError.from(new Error(message));
+  e: SerializableObject;
+  isUserFacingError: boolean;
+  constructor(e: any) {
+    super('User Facing Error');
+    this.e = toSerializableObject(e);
+    this.isUserFacingError = true;
   }
-  static from(err: Error) {
-    err.name = 'UserFacingError';
-    return err;
+  static is(e: any) {
+    if (e) {
+      if (e.data) {
+        if (e.data.cause) {
+          return !!e.data.cause.isUserFacingError;
+        }
+      }
+    }
+    return false;
   }
-  static is(error: any) {
-    return (
-      'message' in error && 'stack' in error && error.name === 'UserFacingError'
-    );
+  static extract(e: TRPCError) {
+    return ((e as any).data.cause as unknown as UserFacingError).e;
   }
 }

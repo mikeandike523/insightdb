@@ -2,10 +2,7 @@ import bcrypt from 'bcryptjs';
 
 import { procedure, router } from '../trpc';
 
-import {
-  SerializableObject,
-  toSerializableObject
-} from '@/types/SerializableObject';
+import { SerializableObject } from '@/types/SerializableObject';
 import UserFacingError from '@/types/UserFacingError';
 import { Connection, WrappedTx, type Procedure } from '@/utils/neo4j';
 import normalizeEmail from '@/utils/normalizeEmail';
@@ -51,8 +48,8 @@ export const userRouter = router({
         )) as Array<SerializableObject>;
 
         if (findUsersResult.length > 0) {
-          return new UserFacingError(
-            'A user already exists with the given email.'
+          throw new UserFacingError(
+            new Error('A user already exists with the given email.')
           );
         }
 
@@ -79,12 +76,16 @@ export const userRouter = router({
         return createUserResult;
       };
 
-      const result: Array<SerializableObject> | UserFacingError =
-        (await connection.withWriter(procedure)) as
-          | Array<SerializableObject>
-          | UserFacingError;
+      // const result: Array<SerializableObject> | UserFacingError =
+      //   (await connection.withWriter(procedure)) as
+      //     | Array<SerializableObject>
+      //     | UserFacingError;
 
-      return toSerializableObject(result);
+      // return toSerializableObject(result);
+
+      await connection.withWriter(procedure);
+
+      return 'User created successfully.';
     })
 });
 

@@ -1,8 +1,8 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useState } from 'react';
 
-import { useRouter } from "next/router";
+import { useRouter } from 'next/router';
 
-import { z } from "zod";
+import { z } from 'zod';
 
 import {
   Alert,
@@ -13,22 +13,22 @@ import {
   Stack,
   Toolbar,
   Typography
-} from "@mui/material";
+} from '@mui/material';
 
-import { useControlledInput } from "@/components/ControlledInput";
+import { useControlledInput } from '@/components/ControlledInput';
 
-import { toSerializableObject } from "@/types/SerializableObject";
-import UserFacingError from "@/types/UserFacingError";
+import { toSerializableObject } from '@/types/SerializableObject';
+import UserFacingError from '@/types/UserFacingError';
 
-import { trpc } from "@/utils/trpc";
-import { TRPCClientError } from "@trpc/client";
+import { trpc } from '@/utils/trpc';
+import { TRPCClientError } from '@trpc/client';
 
 const FormSchema = z.object({
   email: z.string().min(1).email(),
   title: z.string().min(1).optional(),
   name: z.string().min(1),
   orgName: z.string().min(1),
-  password: z.string().min(1),
+  password: z.string().min(1)
 });
 
 export { FormSchema };
@@ -45,44 +45,44 @@ export default function Signup() {
   const [success, setSuccess] = useState<boolean>(false);
 
   const [emailComponent, email] = useControlledInput(
-    "Email Address",
+    'Email Address',
     true,
-    "email",
-    "",
+    'email',
+    '',
     { m: 1 }
   );
 
   const [titleComponent, title] = useControlledInput(
-    "Title",
+    'Title',
     false,
-    "text",
-    "",
+    'text',
+    '',
     {
-      m: 1,
+      m: 1
     }
   );
 
   const [nameComponent, name] = useControlledInput(
-    "Full Name",
+    'Full Name',
     true,
-    "text",
-    "",
+    'text',
+    '',
     { m: 1 }
   );
 
   const [orgNameComponent, orgName] = useControlledInput(
-    "Organization Name",
+    'Organization Name',
     true,
-    "text",
-    "",
+    'text',
+    '',
     { m: 1 }
   );
 
   const [passwordComponent, password] = useControlledInput(
-    "Password",
+    'Password',
     true,
-    "password",
-    "",
+    'password',
+    '',
     { m: 1 }
   );
 
@@ -97,17 +97,14 @@ export default function Signup() {
         title,
         name,
         orgName,
-        password,
+        password
       });
 
       const response = await createUserMutation.mutateAsync(parsed);
-
-      if (UserFacingError.is(response)) {
-        throw response;
-      }
-
       setSuccess(true);
     } catch (e: any) {
+      console.log(toSerializableObject(e));
+
       if (e instanceof z.ZodError) {
         setErrorMessages(
           e.issues.map((issue) => {
@@ -118,16 +115,16 @@ export default function Signup() {
                 </span>
               );
             } else {
-              return "";
+              return '';
             }
           })
         );
       } else if (UserFacingError.is(e)) {
-        setErrorMessages([e.message]);
+        setErrorMessages([UserFacingError.extract(e).message]);
       } else if (e instanceof TRPCClientError) {
         setErrorMessages([e.message, e.stack]);
       } else {
-        if ("message" in e && "stack" in e) {
+        if ('message' in e && 'stack' in e) {
           setErrorMessages([e.message, e.stack]);
         } else {
           setErrorMessages([JSON.stringify(toSerializableObject(e), null, 2)]);
@@ -139,10 +136,10 @@ export default function Signup() {
   return (
     <Box
       sx={{
-        height: "100vh",
-        width: "100%",
-        display: "flex",
-        flexDirection: "column",
+        height: '100vh',
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'column'
       }}
     >
       <AppBar position="relative">
@@ -151,7 +148,7 @@ export default function Signup() {
             <Button
               color="inherit"
               onClick={() => {
-                router.push("/");
+                router.push('/');
               }}
             >
               <Typography variant="h6" component="span">
@@ -162,7 +159,7 @@ export default function Signup() {
           <Button
             color="inherit"
             onClick={() => {
-              router.push("/signin");
+              router.push('/signin');
             }}
           >
             Sign In
@@ -170,7 +167,7 @@ export default function Signup() {
           <Button
             color="inherit"
             onClick={() => {
-              router.push("/signup");
+              router.push('/signup');
             }}
           >
             Sign Up
@@ -180,17 +177,17 @@ export default function Signup() {
       <Container
         maxWidth="lg"
         sx={{
-          height: "100%",
+          height: '100%'
         }}
       >
         <Box
           sx={{
-            width: "100%",
-            height: "100%",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center'
           }}
         >
           <Stack direction="column" alignItems="center">
@@ -220,7 +217,7 @@ export default function Signup() {
                 <Button
                   variant="text"
                   onClick={() => {
-                    router.push("/signin");
+                    router.push('/signin');
                   }}
                 >
                   Sign In

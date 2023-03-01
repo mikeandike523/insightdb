@@ -9,7 +9,7 @@ import { createContext } from '@/utils/trpcContext';
 // @see https://trpc.io/docs/api-handler
 const AppRouter = trpcNext.createNextApiHandler({
   router: appRouter,
-  createContext: createContext,
+  createContext: createContext
 });
 
 export type AppRouter = typeof AppRouter;
