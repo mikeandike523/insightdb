@@ -15,14 +15,19 @@ import { FormSchema } from '@/pages/signup';
 export const userRouter = router({
   create: procedure
     .input(FormSchema)
-    .use(async ({ ctx, next }) => {
-      return next({
-        ctx: {
-          // Specify additional fields to add to ctx object. Original fields
-          // As defined in the Context type in trpcContext.tsx are still present
-        }
-      });
-    })
+
+    //           example of the use of middleware
+    // .use(
+    //   middleware(async ({ ctx, next }) => {
+    //     return next({
+    //       ctx: {
+    //         // Specify additional fields to add to ctx object. Original fields
+    //         // As defined in the Context type in trpcContext.tsx are still present
+    //       }
+    //     });
+    //   })
+    // )
+
     .mutation(async ({ input, ctx }) => {
       const SALT_LENGTH = process.env.SALT_LENGTH
         ? parseInt(process.env.SALT_LENGTH, 10)
