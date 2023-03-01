@@ -1,14 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { write as n4j_write, read as n4j_read } from '@/utils/neo4j';
-import {
-  toSerializableObject,
-  SerializableObject,
-} from '@/types/SerializableObject';
+import { toSerializableObject } from '@/types/SerializableObject';
+import { read as n4j_read, write as n4j_write } from '@/utils/neo4j';
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<any>,
+  res: NextApiResponse<any>
 ) {
   try {
     if (process.env.NODE_ENV === 'production') {

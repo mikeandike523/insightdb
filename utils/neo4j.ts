@@ -1,11 +1,11 @@
 // Adapted from https://dev.to/adamcowley/using-neo4j-in-your-next-nextjs-project-77
 
-import neo4j, { Driver, ManagedTransaction } from 'neo4j-driver';
 import axios from 'axios';
+import neo4j, { Driver, ManagedTransaction } from 'neo4j-driver';
 
 import {
   SerializableObject,
-  toSerializableObject,
+  toSerializableObject
 } from '@/types/SerializableObject';
 
 let _conn: Driver | null;
@@ -16,15 +16,15 @@ export function getConn(): Driver {
   } else {
     if (!process.env.NEO4J_URI) {
       throw new Error(
-        'NEO4J_URI is not set. Note: getConn() is server-side only.',
+        'NEO4J_URI is not set. Note: getConn() is server-side only.'
       );
     } else {
       _conn = neo4j.driver(
         process.env.NEO4J_URI,
         neo4j.auth.basic(
           process.env.NEO4J_USERNAME ?? '',
-          process.env.NEO4J_PASSWORD ?? '',
-        ),
+          process.env.NEO4J_PASSWORD ?? ''
+        )
       );
       return _conn as Driver;
     }
@@ -33,7 +33,7 @@ export function getConn(): Driver {
 
 export async function read(
   cypher: string,
-  params = {},
+  params = {}
 ): Promise<SerializableObject> {
   // 1. Open a session
   const session = getConn().session();
@@ -54,7 +54,7 @@ export async function read(
 
 export async function write(
   cypher: string,
-  params = {},
+  params = {}
 ): Promise<SerializableObject> {
   // 1. Open a session
   const session = getConn().session();
@@ -83,13 +83,13 @@ export function responseToSerializableObject(res: any): SerializableObject {
 
 export async function clientRead(
   cypher: string,
-  params = {},
+  params = {}
 ): Promise<SerializableObject> {
   const data = (
     await axios.post('/api/testing/neo4j-console', {
       queryType: 'read',
       query: cypher,
-      params: params,
+      params: params
     })
   ).data;
   return toSerializableObject(data) as SerializableObject;
@@ -97,13 +97,13 @@ export async function clientRead(
 
 export async function clientWrite(
   cypher: string,
-  params = {},
+  params = {}
 ): Promise<SerializableObject> {
   const data = (
     await axios.post('/api/testing/neo4j-console', {
       queryType: 'write',
       query: cypher,
-      params: params,
+      params: params
     })
   ).data;
   return toSerializableObject(data) as SerializableObject;
@@ -128,7 +128,7 @@ export class Connection {
   }
   async withTransaction(
     mode: 'write' | 'read',
-    procedure: Procedure,
+    procedure: Procedure
   ): Promise<SerializableObject | void> {
     const session = this.conn.session();
     try {

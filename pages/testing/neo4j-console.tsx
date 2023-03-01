@@ -4,7 +4,7 @@ import theme from '@/themes/default';
 
 import {
   clientRead as n4j_read,
-  clientWrite as n4j_write,
+  clientWrite as n4j_write
 } from '@/utils/neo4j';
 
 import { toSerializableObject } from '@/types/SerializableObject';
@@ -40,7 +40,7 @@ export default function Neo4JConsole() {
     } catch (e: unknown) {
       if (e instanceof Error) {
         setResponse(
-          'Error:\n' + JSON.stringify(toSerializableObject(e), null, 2),
+          'Error:\n' + JSON.stringify(toSerializableObject(e), null, 2)
         );
       }
     }
@@ -70,7 +70,7 @@ export default function Neo4JConsole() {
         <button
           onClick={handleRead}
           style={{
-            marginRight: theme.spacing.sm,
+            marginRight: theme.spacing.sm
           }}
         >
           Read

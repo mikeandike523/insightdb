@@ -24,11 +24,14 @@ import { trpc } from '@/utils/trpc';
 import { TRPCClientError } from '@trpc/client';
 
 const FormSchema = z.object({
-  email: z.string().min(1).email(),
-  title: z.string().min(1).optional(),
-  name: z.string().min(1),
-  orgName: z.string().min(1),
-  password: z.string().min(1)
+  email: z
+    .string()
+    .min(1, { message: 'Email address is required' })
+    .email({ message: 'Invalid Email Address' }),
+  title: z.string().optional(),
+  name: z.string().min(1, { message: 'Name is required.' }),
+  orgName: z.string().min(1, { message: 'Organization name is required.' }),
+  password: z.string().min(1, { message: 'Password is required.' })
 });
 
 export { FormSchema };
@@ -44,7 +47,7 @@ export default function Signup() {
 
   const [success, setSuccess] = useState<boolean>(false);
 
-  const [emailComponent, email] = useControlledInput(
+  const [emailComponent, email, setEmailError] = useControlledInput(
     'Email Address',
     true,
     'email',
@@ -52,7 +55,7 @@ export default function Signup() {
     { m: 1 }
   );
 
-  const [titleComponent, title] = useControlledInput(
+  const [titleComponent, title, setTitleError] = useControlledInput(
     'Title',
     false,
     'text',
@@ -62,7 +65,7 @@ export default function Signup() {
     }
   );
 
-  const [nameComponent, name] = useControlledInput(
+  const [nameComponent, name, setNameError] = useControlledInput(
     'Full Name',
     true,
     'text',
@@ -70,7 +73,7 @@ export default function Signup() {
     { m: 1 }
   );
 
-  const [orgNameComponent, orgName] = useControlledInput(
+  const [orgNameComponent, orgName, setOrgNameError] = useControlledInput(
     'Organization Name',
     true,
     'text',
@@ -78,7 +81,7 @@ export default function Signup() {
     { m: 1 }
   );
 
-  const [passwordComponent, password] = useControlledInput(
+  const [passwordComponent, password, setPasswordError] = useControlledInput(
     'Password',
     true,
     'password',
@@ -86,11 +89,23 @@ export default function Signup() {
     { m: 1 }
   );
 
+  const zodErrorMapping: { [key: string]: (error: string) => void } = {
+    email: setEmailError,
+    title: setTitleError,
+    name: setNameError,
+    orgName: setOrgNameError,
+    password: setPasswordError
+  };
+
   const handleSubmit = async () => {
     try {
       setSuccess(false);
 
       setErrorMessages([]);
+
+      for (const key in zodErrorMapping) {
+        zodErrorMapping[key]('');
+      }
 
       const parsed = FormSchema.parse({
         email,
@@ -100,25 +115,19 @@ export default function Signup() {
         password
       });
 
-      const response = await createUserMutation.mutateAsync(parsed);
+      await createUserMutation.mutateAsync(parsed);
+
       setSuccess(true);
     } catch (e: any) {
-      console.log(toSerializableObject(e));
-
       if (e instanceof z.ZodError) {
-        setErrorMessages(
-          e.issues.map((issue) => {
-            if (issue.path.length > 0) {
-              return (
-                <span key={0}>
-                  <b>{issue.path[0]}:</b>&nbsp;{issue.message}
-                </span>
-              );
-            } else {
-              return '';
+        e.issues.forEach((issue) => {
+          if (issue.path.length > 0) {
+            const path = issue.path.join('.');
+            if (path in zodErrorMapping) {
+              zodErrorMapping[path](issue.message);
             }
-          })
-        );
+          }
+        });
       } else if (UserFacingError.is(e)) {
         setErrorMessages([UserFacingError.extract(e).message]);
       } else if (e instanceof TRPCClientError) {

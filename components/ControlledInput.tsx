@@ -1,11 +1,11 @@
 import { useState } from 'react';
 
 import {
-  TextField,
-  InputAdornment,
   IconButton,
+  InputAdornment,
   SxProps,
-  Theme,
+  TextField,
+  Theme
 } from '@mui/material';
 
 import Visibility from '@mui/icons-material/Visibility';
@@ -17,10 +17,11 @@ export function useControlledInput(
   type: 'text' | 'number' | 'password' | 'email' | 'tel',
   initialValue = '',
   sx: SxProps<Theme> = {},
-  onChange: () => void = () => {},
-): [JSX.Element, string] {
+  onChange: () => void = () => {}
+): [JSX.Element, string, (error: string) => void] {
   const [value, setValue] = useState<string>(initialValue);
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [error, setError] = useState<string>('');
   const component =
     type === 'password' ? (
       <TextField
@@ -29,6 +30,8 @@ export function useControlledInput(
         defaultValue={initialValue}
         label={label}
         type={showPassword ? 'text' : 'password'}
+        error={!!error}
+        helperText={error ?? undefined}
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">
@@ -40,7 +43,7 @@ export function useControlledInput(
                 {showPassword ? <VisibilityOff /> : <Visibility />}
               </IconButton>
             </InputAdornment>
-          ),
+          )
         }}
         sx={sx}
         onChange={(event) => {
@@ -54,6 +57,8 @@ export function useControlledInput(
         required={required}
         sx={sx}
         type={type}
+        error={!!error}
+        helperText={error ?? undefined}
         label={label}
         defaultValue={initialValue}
         onChange={(e) => {
@@ -63,5 +68,11 @@ export function useControlledInput(
       />
     );
 
-  return [component, value];
+  return [
+    component,
+    value,
+    (error: string) => {
+      setError(error);
+    }
+  ];
 }

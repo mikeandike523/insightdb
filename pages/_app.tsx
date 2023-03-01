@@ -6,8 +6,8 @@ import { CookiesProvider } from 'react-cookie';
 
 import Head from 'next/head';
 
-import { AppType } from 'next/dist/shared/lib/utils';
 import { trpc } from '@/utils/trpc';
+import { AppType } from 'next/dist/shared/lib/utils';
 
 import type { AppProps } from 'next/app';
 
@@ -26,7 +26,7 @@ const App: AppType = ({ Component, pageProps }: AppProps) => {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            justifyContent: 'center',
+            justifyContent: 'center'
           }}
         >
           <CircularProgress />

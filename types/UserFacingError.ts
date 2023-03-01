@@ -19,7 +19,9 @@ export default class UserFacingError extends Error {
     }
     return false;
   }
-  static extract(e: TRPCError) {
-    return ((e as any).data.cause as unknown as UserFacingError).e;
+  static extract(e: TRPCError): any {
+    return (
+      ((e as any).data.cause as unknown as UserFacingError).e ?? ({} as any)
+    );
   }
 }

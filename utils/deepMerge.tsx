@@ -2,7 +2,7 @@ import type { SerializableObject } from '@/types/SerializableObject';
 
 export default function deepMerge(
   A: SerializableObject,
-  B: SerializableObject,
+  B: SerializableObject
 ): SerializableObject {
   const result: SerializableObject = {};
 
@@ -19,7 +19,7 @@ export default function deepMerge(
       ) {
         result[key] = deepMerge(
           A ?? ({}[key as keyof SerializableObject] as SerializableObject),
-          B ?? ({}[key as keyof SerializableObject] as SerializableObject),
+          B ?? ({}[key as keyof SerializableObject] as SerializableObject)
         );
       } else {
         result[key] = B ?? {}[key as keyof SerializableObject];

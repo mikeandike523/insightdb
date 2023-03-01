@@ -1,13 +1,12 @@
 import { useRouter } from 'next/router';
 
 import {
-  Container,
-  Typography,
   Box,
-  Grid,
   Button,
-  Stack,
+  Container,
   Paper,
+  Stack,
+  Typography
 } from '@mui/material';
 
 export default function Home() {
@@ -21,7 +20,7 @@ export default function Home() {
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          height: '100vh',
+          height: '100vh'
         }}
       >
         <Paper elevation={5} sx={{ padding: '8px' }}>

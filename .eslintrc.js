@@ -25,6 +25,7 @@ module.exports = {
       {
         extensions: ['.js', '.jsx', '.ts', '.tsx']
       }
-    ]
+    ],
+    '@typescript-eslint/no-empty-function': 'off'
   }
 };

@@ -1,23 +1,20 @@
 import {
-  useState,
-  useEffect,
   createContext,
-  useContext,
   Dispatch,
-  SetStateAction,
   ReactNode,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useState
 } from 'react';
 
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
-
-import deepMerge from '@/utils/deepMerge';
 import { SerializableObject } from '@/types/SerializableObject';
-import { getSession } from '@/utils/session';
+import deepMerge from '@/utils/deepMerge';
 
 type ContextType = [
   string, // Global state is stored in stringified form just to make sure
   // React will always re-render on state change
-  Dispatch<SetStateAction<string>>,
+  Dispatch<SetStateAction<string>>
 ];
 
 function emptyContextType(): ContextType {
@@ -30,7 +27,7 @@ class StateManager {
 
   constructor(
     initialStateAsString: string,
-    setStateAsString: Dispatch<SetStateAction<string>>,
+    setStateAsString: Dispatch<SetStateAction<string>>
   ) {
     this.state = JSON.parse(initialStateAsString);
     this.setStateAsString = setStateAsString;
@@ -46,7 +43,7 @@ class StateManager {
     if (typeof window !== 'undefined') {
       window.localStorage.setItem(
         'globalStateAsString',
-        JSON.stringify(this.state),
+        JSON.stringify(this.state)
       );
     }
 
@@ -62,7 +59,7 @@ const GlobalContext = createContext<ContextType>(emptyContextType());
 
 export function GlobalStateProvider({
   children,
-  defaultComponent = <></>,
+  defaultComponent = <></>
 }: {
   children?: ReactNode | ReactNode[];
   defaultComponent?: ReactNode | ReactNode[];
@@ -75,7 +72,7 @@ export function GlobalStateProvider({
     if (typeof window !== 'undefined') {
       if (window.sessionStorage.getItem('globalStateAsString')) {
         setStateAsString(
-          window.sessionStorage.getItem('globalStateAsString') ?? '{}',
+          window.sessionStorage.getItem('globalStateAsString') ?? '{}'
         );
       }
       setHydrated(true);

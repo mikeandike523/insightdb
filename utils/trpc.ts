@@ -30,9 +30,9 @@ export const trpc = createTRPCNext<AppRouter>({
            * If you want to use SSR, you need to use the server's full URL
            * @link https://trpc.io/docs/ssr
            **/
-          url: `${getBaseUrl()}/api/trpc`,
-        }),
-      ],
+          url: `${getBaseUrl()}/api/trpc`
+        })
+      ]
       /**
        * @link https://tanstack.com/query/v4/docs/reference/QueryClient
        **/
@@ -42,5 +42,5 @@ export const trpc = createTRPCNext<AppRouter>({
   /**
    * @link https://trpc.io/docs/ssr
    **/
-  ssr: false,
+  ssr: false
 });

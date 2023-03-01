@@ -2,16 +2,14 @@
 
 import { initTRPC } from '@trpc/server';
 
-import { toSerializableObject } from '@/types/SerializableObject';
 import type { Context } from '@/utils/trpcContext';
 
 // Avoid exporting the entire t-object
 // since it's not very descriptive.
 // For instance, the use of a t variable
-// is common in i18n libraries.
+// is common in in libraries.
 const t = initTRPC.context<Context>().create({
   errorFormatter({ shape, error }) {
-    console.log('formatter', toSerializableObject(error));
     if (error.cause) {
       return {
         ...shape,
