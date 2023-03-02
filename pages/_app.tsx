@@ -6,7 +6,6 @@ import { CookiesProvider } from 'react-cookie';
 
 import Head from 'next/head';
 
-import { trpc } from '@/utils/trpc';
 import { AppType } from 'next/dist/shared/lib/utils';
 
 import type { AppProps } from 'next/app';
@@ -43,4 +42,4 @@ const App: AppType = ({ Component, pageProps }: AppProps) => {
   );
 };
 
-export default trpc.withTRPC(App);
+export default App;

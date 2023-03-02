@@ -68,7 +68,7 @@ export const userRouter = router({
 
     return 'User created successfully.';
   }),
-  auth: procedure.input(SigninFormSchema).mutation(async ({ input, ctx }) => {
+  auth: procedure.input(SigninFormSchema).query(async ({ input, ctx }) => {
     const session = ctx.session;
 
     const email = input.email;

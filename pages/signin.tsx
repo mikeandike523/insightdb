@@ -36,7 +36,6 @@ export { FormSchema };
 export type FormValues = z.infer<typeof FormSchema>;
 
 export default function Signin() {
-  const authUserMutation = trpc.user.auth.useMutation();
   const router = useRouter();
 
   const [errorMessages, setErrorMessages] = useState<ReactNode[]>([]);
@@ -79,7 +78,7 @@ export default function Signin() {
         password
       });
 
-      const result = await authUserMutation.mutateAsync(parsed);
+      const result = await trpc.user.auth.query(parsed);
 
       console.log(result);
 
