@@ -45,7 +45,7 @@ export function useControlledInput(
             </InputAdornment>
           )
         }}
-        sx={sx}
+        sx={{ ...{ m: 1 }, ...sx }}
         onChange={(event) => {
           setValue(event.target.value);
           onChange();
@@ -55,7 +55,7 @@ export function useControlledInput(
       <TextField
         fullWidth
         required={required}
-        sx={sx}
+        sx={{ ...{ m: 1 }, ...sx }}
         type={type}
         error={!!error}
         helperText={error ?? undefined}

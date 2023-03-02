@@ -28,9 +28,6 @@ const FormSchema = z.object({
     .string()
     .min(1, { message: 'Email address is required' })
     .email({ message: 'Invalid Email Address' }),
-  title: z.string().optional(),
-  name: z.string().min(1, { message: 'Name is required.' }),
-  orgName: z.string().min(1, { message: 'Organization name is required.' }),
   password: z.string().min(1, { message: 'Password is required.' })
 });
 
@@ -38,9 +35,8 @@ export { FormSchema };
 
 export type FormValues = z.infer<typeof FormSchema>;
 
-export default function Signup() {
-  const createUserMutation = trpc.user.create.useMutation();
-
+export default function Signin() {
+  const authUserMutation = trpc.user.auth.useMutation();
   const router = useRouter();
 
   const [errorMessages, setErrorMessages] = useState<ReactNode[]>([]);
@@ -55,32 +51,6 @@ export default function Signup() {
     { m: 1 }
   );
 
-  const [titleComponent, title, setTitleError] = useControlledInput(
-    'Title',
-    false,
-    'text',
-    '',
-    {
-      m: 1
-    }
-  );
-
-  const [nameComponent, name, setNameError] = useControlledInput(
-    'Full Name',
-    true,
-    'text',
-    '',
-    { m: 1 }
-  );
-
-  const [orgNameComponent, orgName, setOrgNameError] = useControlledInput(
-    'Organization Name',
-    true,
-    'text',
-    '',
-    { m: 1 }
-  );
-
   const [passwordComponent, password, setPasswordError] = useControlledInput(
     'Password',
     true,
@@ -91,9 +61,6 @@ export default function Signup() {
 
   const zodErrorMapping: { [key: string]: (error: string) => void } = {
     email: setEmailError,
-    title: setTitleError,
-    name: setNameError,
-    orgName: setOrgNameError,
     password: setPasswordError
   };
 
@@ -109,15 +76,16 @@ export default function Signup() {
 
       const parsed = FormSchema.parse({
         email,
-        title,
-        name,
-        orgName,
         password
       });
 
-      await createUserMutation.mutateAsync(parsed);
+      const result = await authUserMutation.mutateAsync(parsed);
+
+      console.log(result);
 
       setSuccess(true);
+
+      router.push('/dashboard');
     } catch (e: any) {
       if (e instanceof z.ZodError) {
         e.issues.forEach((issue) => {
@@ -207,12 +175,9 @@ export default function Signup() {
             }}
           >
             <Typography variant="h2" component="h1">
-              Sign Up
+              Sign In
             </Typography>
             {emailComponent}
-            {titleComponent}
-            {nameComponent}
-            {orgNameComponent}
             {passwordComponent}
             <Button
               fullWidth
@@ -237,17 +202,7 @@ export default function Signup() {
             )}
             {success && (
               <Alert sx={{ m: 1 }} severity="success">
-                <Typography variant="body1">
-                  Signup Successful&nbsp;
-                  <Button
-                    variant="text"
-                    onClick={() => {
-                      router.push('/signin');
-                    }}
-                  >
-                    Sign In
-                  </Button>
-                </Typography>
+                <Typography variant="body1">Signin Successful</Typography>
               </Alert>
             )}
           </Stack>

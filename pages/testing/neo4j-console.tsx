@@ -9,16 +9,18 @@ import {
 
 import { toSerializableObject } from '@/types/SerializableObject';
 
-export default function Neo4JConsole() {
-  if (process.env.NODE_ENV === 'production') {
-    return <>Not available in production.</>;
-  }
+import { Link } from '@mui/material';
 
+export default function Neo4JConsole() {
   const [query, setQuery] = useState('');
 
   const [response, setResponse] = useState('');
 
   const [paramsAsString, setParamsAsString] = useState('{}');
+
+  if (process.env.NODE_ENV === 'production') {
+    return <>Not available in production.</>;
+  }
 
   const handleWrite = async () => {
     try {
@@ -48,6 +50,7 @@ export default function Neo4JConsole() {
 
   return (
     <>
+      <Link href="/">Home</Link>
       <h1>Neo4J Console</h1>
       <div>Query:</div>
       <textarea
