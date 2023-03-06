@@ -8,7 +8,6 @@ import {
   useState
 } from 'react';
 
-import { SerializableObject } from '@/types/SerializableObject';
 import deepMerge from '@/utils/deepMerge';
 
 type ContextType = [
@@ -22,7 +21,7 @@ function emptyContextType(): ContextType {
 }
 
 class StateManager {
-  state: SerializableObject;
+  state: any;
   setStateAsString: Dispatch<SetStateAction<string>>;
 
   constructor(
@@ -31,17 +30,21 @@ class StateManager {
   ) {
     this.state = JSON.parse(initialStateAsString);
     this.setStateAsString = setStateAsString;
+
+    if (typeof window !== 'undefined') {
+      (window as any).globalState = this;
+    }
   }
 
   get() {
     return this.state;
   }
 
-  update(updates: SerializableObject) {
+  update(updates: any) {
     this.state = deepMerge(this.state, updates);
 
     if (typeof window !== 'undefined') {
-      window.localStorage.setItem(
+      window.sessionStorage.setItem(
         'globalStateAsString',
         JSON.stringify(this.state)
       );

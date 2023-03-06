@@ -1,22 +1,37 @@
 import { useRouter } from 'next/router';
 
-import { Box, Button, Link, Stack, Typography } from '@mui/material';
+import { Button, Link, Stack, Typography } from '@mui/material';
+
+import { useGlobalState } from '@/utils/GlobalState';
 
 export default function Home() {
   const router = useRouter();
 
-  return (
-    <Box sx={{}} style={{ height: '100%', width: '100%' }}>
+  const globalState = useGlobalState();
+
+  if (globalState.get().user) {
+    router.push('/dashboard');
+  }
+
+  return !globalState.get().user ? (
+    <div style={{ height: '100vh', width: '100vw' }}>
       {process.env.NODE_ENV === 'development' && (
-        <Link href="/testing/neo4j-console">Neo4J Console</Link>
+        <Link
+          style={{
+            position: 'absolute'
+          }}
+          href="/testing/neo4j-console"
+        >
+          Neo4J Console
+        </Link>
       )}
-      <Box
-        sx={{
+      <div
+        style={{
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          height: '100vh'
+          height: '100%'
         }}
       >
         <Stack direction="column" alignItems="center">
@@ -43,7 +58,9 @@ export default function Home() {
             </Button>
           </Stack>
         </Stack>
-      </Box>
-    </Box>
+      </div>
+    </div>
+  ) : (
+    <></>
   );
 }

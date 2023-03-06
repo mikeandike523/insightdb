@@ -1,31 +1,27 @@
 import type { SerializableObject } from '@/types/SerializableObject';
 
-export default function deepMerge(
-  A: SerializableObject,
-  B: SerializableObject
-): SerializableObject {
-  const result: SerializableObject = {};
+export default function deepMerge(A: any, B: any): SerializableObject {
+  const result: any = {};
 
-  Object.assign(result, A);
-
-  for (const key in B as object) {
-    if (!(key in (A as object))) {
-      result[key as keyof SerializableObject] =
-        B ?? {}[key as keyof SerializableObject];
-    } else {
-      if (
-        typeof (A ?? {}[key as keyof SerializableObject]) === 'object' &&
-        typeof (B ?? {}[key as keyof SerializableObject]) === 'object'
-      ) {
-        result[key] = deepMerge(
-          A ?? ({}[key as keyof SerializableObject] as SerializableObject),
-          B ?? ({}[key as keyof SerializableObject] as SerializableObject)
-        );
-      } else {
-        result[key] = B ?? {}[key as keyof SerializableObject];
-      }
-    }
+  for (const key in A) {
+    result[key] = A[key];
   }
 
-  return result;
+  for (const key in B) {
+    if (!(key in A)) {
+      result[key] = B[key];
+      continue;
+    }
+    if (typeof A[key] !== 'object') {
+      result[key] = B[key];
+      continue;
+    }
+    if (typeof A[key] !== 'object') {
+      result[key] = B[key];
+      continue;
+    }
+    result[key] = deepMerge(A[key], B[key]);
+  }
+
+  return result as SerializableObject;
 }

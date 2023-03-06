@@ -1,4 +1,4 @@
-type primitive = string | number | boolean | null;
+type Primitive = string | number | boolean | null;
 
 function isPrimitive(value: unknown): boolean {
   if (value === null) {
@@ -16,9 +16,9 @@ function isPrimitive(value: unknown): boolean {
 
 export type SerializableObject =
   | {
-      [key: string | number]: primitive | primitive[] | SerializableObject;
+      [key: string | number]: Primitive | Primitive[] | SerializableObject;
     }
-  | primitive
+  | Primitive
   | SerializableObject[];
 
 export function toSerializableObject(
@@ -31,6 +31,8 @@ export function toSerializableObject(
 
   const references: any[] =
     typeof _references !== 'undefined' ? _references : [];
+
+  references.push(obj);
 
   if (Array.isArray(obj)) {
     const result: SerializableObject[] = [];

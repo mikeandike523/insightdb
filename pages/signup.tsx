@@ -19,6 +19,7 @@ import { useControlledInput } from '@/components/ControlledInput';
 
 import { toSerializableObject } from '@/types/SerializableObject';
 import UserFacingError from '@/types/UserFacingError';
+import { useGlobalState } from '@/utils/GlobalState';
 
 import { trpc } from '@/utils/trpc';
 import { TRPCClientError } from '@trpc/client';
@@ -40,6 +41,12 @@ export type FormValues = z.infer<typeof FormSchema>;
 
 export default function Signup() {
   const router = useRouter();
+
+  const globalState = useGlobalState();
+
+  if (globalState.get().user) {
+    router.push('/dashboard');
+  }
 
   const [errorMessages, setErrorMessages] = useState<ReactNode[]>([]);
 
@@ -140,7 +147,7 @@ export default function Signup() {
     }
   };
 
-  return (
+  return !globalState.get().user ? (
     <Box
       sx={{
         height: '100vh',
@@ -252,5 +259,7 @@ export default function Signup() {
         </Box>
       </Container>
     </Box>
+  ) : (
+    <></>
   );
 }

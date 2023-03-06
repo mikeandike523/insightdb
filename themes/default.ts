@@ -21,6 +21,11 @@ const theme: any = {
       },
       primary: 'rgb(10, 90, 160)'
     }
+  },
+  navbar: {
+    drawer: {
+      width: '250px'
+    }
   }
 };
 

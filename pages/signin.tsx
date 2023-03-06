@@ -20,6 +20,7 @@ import { useControlledInput } from '@/components/ControlledInput';
 import { toSerializableObject } from '@/types/SerializableObject';
 import UserFacingError from '@/types/UserFacingError';
 
+import { useGlobalState } from '@/utils/GlobalState';
 import { trpc } from '@/utils/trpc';
 import { TRPCClientError } from '@trpc/client';
 
@@ -37,6 +38,12 @@ export type FormValues = z.infer<typeof FormSchema>;
 
 export default function Signin() {
   const router = useRouter();
+
+  const globalState = useGlobalState();
+
+  if (globalState.get().user) {
+    router.push('/dashboard');
+  }
 
   const [errorMessages, setErrorMessages] = useState<ReactNode[]>([]);
 
@@ -78,11 +85,13 @@ export default function Signin() {
         password
       });
 
-      const result = await trpc.user.auth.query(parsed);
+      const user = await trpc.user.auth.query(parsed);
 
-      console.log(result);
+      console.log(user);
 
       setSuccess(true);
+
+      globalState.update({ user: user });
 
       router.push('/dashboard');
     } catch (e: any) {
@@ -109,7 +118,7 @@ export default function Signin() {
     }
   };
 
-  return (
+  return !globalState.get().user ? (
     <Box
       sx={{
         height: '100vh',
@@ -208,5 +217,7 @@ export default function Signin() {
         </Box>
       </Container>
     </Box>
+  ) : (
+    <></>
   );
 }
