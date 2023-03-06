@@ -1,5 +1,7 @@
 import { useState } from 'react';
 
+import { useRouter } from 'next/router';
+
 import theme from '@/themes/default';
 
 import {
@@ -9,9 +11,11 @@ import {
 
 import { toSerializableObject } from '@/types/SerializableObject';
 
-import { Link } from '@mui/material';
+import { Button } from '@mui/material';
 
 export default function Neo4JConsole() {
+  const router = useRouter();
+
   const [query, setQuery] = useState('');
 
   const [response, setResponse] = useState('');
@@ -50,7 +54,13 @@ export default function Neo4JConsole() {
 
   return (
     <>
-      <Link href="/">Home</Link>
+      <Button
+        onClick={() => {
+          router.push('/');
+        }}
+      >
+        Home
+      </Button>
       <h1>Neo4J Console</h1>
       <div>Query:</div>
       <textarea

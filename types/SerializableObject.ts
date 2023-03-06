@@ -21,9 +21,10 @@ export type SerializableObject =
   | Primitive
   | SerializableObject[];
 
-export function toSerializableObject(
+export function _toSerializableObject(
   obj: any,
-  _references?: any[]
+  _references?: any[],
+  enumerableOnly = false
 ): SerializableObject {
   if (isPrimitive(obj)) {
     return obj as SerializableObject;
@@ -46,13 +47,19 @@ export function toSerializableObject(
       if (isPrimitive(obj[i])) {
         result.push(obj[i]);
       } else {
-        result.push(toSerializableObject(obj[i], references));
+        result.push(_toSerializableObject(obj[i], references, enumerableOnly));
       }
     }
     return result as SerializableObject;
   } else {
     const result: SerializableObject = {};
-    const keys = Object.getOwnPropertyNames(obj);
+    let keys = Object.getOwnPropertyNames(obj);
+    if (enumerableOnly) {
+      keys = [];
+      for (const key in obj) {
+        keys.push(key);
+      }
+    }
     for (let keyIdx = 0; keyIdx < keys.length; keyIdx++) {
       const key = keys[keyIdx];
 
@@ -65,9 +72,24 @@ export function toSerializableObject(
       if (isPrimitive(obj[key])) {
         result[key] = obj[key];
       } else {
-        result[key] = toSerializableObject(obj[key], references);
+        result[key] = _toSerializableObject(
+          obj[key],
+          references,
+          enumerableOnly
+        );
       }
     }
     return result as SerializableObject;
   }
+}
+
+export function toSerializableObject(obj: any, _references?: any[]) {
+  return _toSerializableObject(obj, _references, false);
+}
+
+export function toSerializableObjectEnumerableOnly(
+  obj: any,
+  _references?: any[]
+) {
+  return _toSerializableObject(obj, _references, true);
 }

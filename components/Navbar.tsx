@@ -7,6 +7,7 @@ import {
   Box,
   Breadcrumbs,
   Button,
+  Divider,
   Drawer,
   IconButton,
   Link,
@@ -24,6 +25,8 @@ import { useGlobalState } from '@/utils/GlobalState';
 import { drawerTransitionCSS } from '@/utils/MUIUtils';
 
 import theme from '@/themes/default';
+
+import { usePopoverMenu } from './PopoverMenu';
 
 export default function Navbar({
   children,
@@ -50,6 +53,27 @@ export default function Navbar({
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
 
   const drawerWidth = theme.navbar.drawer.width;
+
+  const [accountPopoverMenu, accountPopoverMenuOnClick] = usePopoverMenu(
+    [
+      {
+        label: 'Profile',
+        onClick: '/profile'
+      },
+      {
+        label: 'Account',
+        onClick: '/account'
+      },
+      {
+        label: 'Sign Out',
+        onClick: '/signout'
+      }
+    ],
+    {
+      vertical: 'bottom',
+      horizontal: 'right'
+    }
+  );
 
   return (
     <>
@@ -111,6 +135,7 @@ export default function Navbar({
             sx={{ lineHeight: '100%' }}
             color="inherit"
             startIcon={<AccountCircleIcon />}
+            onClick={accountPopoverMenuOnClick}
           >
             {greeting}
           </Button>
@@ -127,7 +152,9 @@ export default function Navbar({
         <Box sx={{ width: drawerWidth }}>
           <List>
             {drawerLinks.map((link, index) => {
-              return (
+              return link.href === '__divider__' ? (
+                <Divider />
+              ) : (
                 <ListItem
                   key={index}
                   disablePadding
@@ -150,6 +177,7 @@ export default function Navbar({
       >
         {children}
       </div>
+      {accountPopoverMenu}
     </>
   );
 }

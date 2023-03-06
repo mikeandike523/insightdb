@@ -3,7 +3,10 @@ import jwt from 'jsonwebtoken';
 
 import { procedure, router } from '../trpc';
 
-import { SerializableObject } from '@/types/SerializableObject';
+import {
+  SerializableObject,
+  toSerializableObject
+} from '@/types/SerializableObject';
 import UserFacingError from '@/types/UserFacingError';
 import { Connection, WrappedTx, type Procedure } from '@/utils/neo4j';
 import normalizeEmail from '@/utils/normalizeEmail';
@@ -150,6 +153,15 @@ export const userRouter = router({
       name: claims.name,
       orgName: claims.orgName
     };
+  }),
+  me: procedure.query(async ({ ctx }) => {
+    if (process.env.NODE_ENV !== 'development') {
+      return 'Not available outside development';
+    }
+
+    const session = ctx.session;
+
+    return toSerializableObject(session);
   })
 });
 
