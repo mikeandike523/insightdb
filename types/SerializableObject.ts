@@ -1,13 +1,14 @@
 type Primitive = string | number | boolean | null;
 
-function isPrimitive(value: unknown): boolean {
+function isStringifiable(value: unknown): boolean {
   if (value === null) {
     return true;
   }
   if (
     typeof value === 'string' ||
     typeof value === 'number' ||
-    typeof value === 'boolean'
+    typeof value === 'boolean' ||
+    (typeof value === 'object' && 'toJSON' in value)
   ) {
     return true;
   }
@@ -26,7 +27,7 @@ export function _toSerializableObject(
   _references?: any[],
   enumerableOnly = false
 ): SerializableObject {
-  if (isPrimitive(obj)) {
+  if (isStringifiable(obj)) {
     return obj as SerializableObject;
   }
 
@@ -44,7 +45,7 @@ export function _toSerializableObject(
       if (references.includes(obj[i])) {
         continue;
       }
-      if (isPrimitive(obj[i])) {
+      if (isStringifiable(obj[i])) {
         result.push(obj[i]);
       } else {
         result.push(_toSerializableObject(obj[i], references, enumerableOnly));
@@ -69,7 +70,7 @@ export function _toSerializableObject(
       if (references.includes(obj[key])) {
         continue;
       }
-      if (isPrimitive(obj[key])) {
+      if (isStringifiable(obj[key])) {
         result[key] = obj[key];
       } else {
         result[key] = _toSerializableObject(
@@ -92,4 +93,46 @@ export function toSerializableObjectEnumerableOnly(
   _references?: any[]
 ) {
   return _toSerializableObject(obj, _references, true);
+}
+
+export function unroll(
+  obj: SerializableObject,
+  separator = '.'
+): SerializableObject {
+  if (typeof obj !== 'object') {
+    throw new Error('Cannot unroll non-object');
+  }
+  const unrollInner = (obj: SerializableObject, prefix = '') => {
+    if (typeof obj !== 'object') {
+      throw new Error('Cannot unroll non-object');
+    }
+    const result: SerializableObject = {};
+    for (const key in obj) {
+      if (typeof obj[key as keyof SerializableObject] === 'object') {
+        result[(prefix + key) as keyof SerializableObject] = unrollInner(
+          obj[key as keyof SerializableObject],
+          prefix + key + separator
+        );
+      } else {
+        result[prefix + key] = obj[key as keyof SerializableObject];
+      }
+    }
+    return result;
+  };
+  const flatten = (obj: SerializableObject) => {
+    const flat: SerializableObject = {};
+    for (const key in obj as object) {
+      if (typeof (obj as object)[key as keyof object] === 'object') {
+        const subobj = flatten((obj as object)[key as keyof object]);
+        for (const subkey in subobj) {
+          flat[subkey] = subobj[subkey];
+        }
+      } else {
+        flat[key] = (obj as object)[key as keyof object];
+      }
+    }
+    return flat;
+  };
+  const labeled: SerializableObject = unrollInner(obj, '');
+  return flatten(labeled);
 }
