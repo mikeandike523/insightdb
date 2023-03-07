@@ -15,7 +15,10 @@ const t = initTRPC.context<Context>().create({
         ...shape,
         data: {
           ...shape.data,
-          cause: error.cause
+          cause: error.cause,
+          ...{
+            statusCode: (error.cause as any).statusCode ?? 500
+          }
         }
       };
     }

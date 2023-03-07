@@ -1,3 +1,10 @@
+import {
+  AnyRecord,
+  arraysAreEqual,
+  selectInverseSubset,
+  selectSubset
+} from '@/utils/tsutils';
+
 type Primitive = string | number | boolean | null;
 
 function isStringifiable(value: unknown): boolean {
@@ -22,7 +29,104 @@ export type SerializableObject =
   | Primitive
   | SerializableObject[];
 
-export function _toSerializableObject(
+export type SerializableArray = SerializableObject[];
+
+export type SerializableRecord = {
+  [key: string | number]: SerializableObject;
+};
+
+export function serializableRecordStrictlySatisfiesInterface<
+  T extends SerializableRecord
+>(record: SerializableRecord) {
+  return arraysAreEqual(Object.keys({} as T), Object.keys(record));
+}
+
+export function serializableRecordStrictlyMatches(
+  obj1: SerializableRecord,
+  obj2: SerializableRecord
+) {
+  return (
+    arraysAreEqual(Object.keys(obj1), Object.keys(obj2)) &&
+    arraysAreEqual<any>(
+      Object.keys(obj1).map((key) => obj1[key]),
+      Object.keys(obj2).map((key) => obj2[key])
+    )
+  );
+}
+
+export function recordSubset(record: SerializableRecord, subset: string[]) {
+  return selectSubset(record as AnyRecord, subset) as SerializableRecord;
+}
+
+export function recordInverseSubset(
+  record: SerializableRecord,
+  subset: string[]
+) {
+  return selectInverseSubset(record as AnyRecord, subset) as SerializableRecord;
+}
+
+export type SerializableRecordTree = {
+  [key: string | number]:
+    | SerializableObject
+    | SerializableRecord
+    | SerializableRecordTree;
+};
+
+export class KeyError extends Error {}
+
+export class TreeAccessor {
+  data: SerializableRecordTree;
+
+  constructor(data: SerializableRecordTree) {
+    this.data = data;
+  }
+  get(path: string[], strict = true): SerializableObject | undefined {
+    let unwrapped: any = this.data;
+    for (let i = 0; i < path.length; i++) {
+      const segment = path[i];
+      const value = unwrapped[segment];
+      if (typeof value === 'undefined') {
+        if (strict) {
+          throw new KeyError(
+            `TreeAccessor: path \`${path.join('.')}\` broke starting\`${path
+              .slice(0, i + 1)
+              .join('.')}\``
+          );
+        } else {
+          return undefined;
+        }
+      } else if (typeof value === 'object') {
+        unwrapped = value;
+      } else {
+        if (i == path.length - 1) {
+          return value as SerializableObject;
+        } else {
+          if (strict) {
+            throw new KeyError(
+              `TreeAccessor: path \`${path.join('.')}\` broke starting\`${path
+                .slice(0, i + 1)
+                .join('.')}\``
+            );
+          } else {
+            return undefined;
+          }
+        }
+      }
+    }
+  }
+  getStrict(path: string[]): SerializableObject {
+    return this.get(path, true) as SerializableObject;
+  }
+  getLax(path: string[]): SerializableObject | undefined {
+    return this.get(path, false);
+  }
+}
+
+export function TreeAccess(data: SerializableRecordTree) {
+  return new TreeAccessor(data);
+}
+
+function _toSerializableObject(
   obj: any,
   _references?: any[],
   enumerableOnly = false

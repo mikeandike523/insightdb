@@ -129,13 +129,18 @@ export const userRouter = router({
 
     const claims = (await connection.withReader(procedure)) as any;
 
+    claims.expiresIn = 60 * 60 * 24; // 24 hrs
+
     if (!process.env.JWT_SECRET) {
       throw new Error('JWT_SECRET is not set.');
     }
 
     const token = jwt.sign(
       claims as object,
-      process.env.JWT_SECRET ?? 'BAD_SECRET'
+      process.env.JWT_SECRET ?? 'BAD_SECRET',
+      {
+        expiresIn: claims.expiresIn
+      }
     );
 
     session.user = {

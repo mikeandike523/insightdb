@@ -1,5 +1,11 @@
-import { router } from '../trpc';
+import { procedure, router } from '../trpc';
 
-export const userDataRouter = router({});
+import { authMiddleware } from '../authMiddleware';
+
+export const userDataRouter = router({
+  me: procedure.use(authMiddleware).query(({ ctx }) => {
+    return ctx.user;
+  })
+});
 
 export type UserDataouter = typeof userDataRouter;

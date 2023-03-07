@@ -3,7 +3,7 @@
 import { router } from '../trpc';
 
 import { userRouter } from './user';
-import { userDataRouter } from './userdata';
+import { userDataRouter } from './userData';
 
 export const appRouter = router({
   user: userRouter,
