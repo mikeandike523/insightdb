@@ -26,6 +26,9 @@ const theme: any = {
     drawer: {
       width: '250px'
     }
+  },
+  paper: {
+    elevation: 3
   }
 };
 

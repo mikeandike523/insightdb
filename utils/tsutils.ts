@@ -60,3 +60,7 @@ export function stripUndefined(a: any, recursive = true): any {
     }
   }
 }
+
+export function iota(k: number) {
+  return Array.from({ length: k }, (_, i) => i);
+}
