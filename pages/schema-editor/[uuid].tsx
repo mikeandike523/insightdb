@@ -3,9 +3,12 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 
 import {
+  Box,
+  Button,
+  Checkbox,
   CircularProgress,
+  Divider,
   Fab,
-  Paper,
   Stack,
   TextField,
   Typography
@@ -13,30 +16,62 @@ import {
 
 import EditIcon from '@mui/icons-material/Edit';
 
-import SaveIcon from '@mui/icons-material/Save';
+import CheckIcon from '@mui/icons-material/Check';
+
+import AddIcon from '@mui/icons-material/Add';
 
 import CPanelPage from '@/components/CPanelPage';
 
-import { DragHandle, ReorderableList } from '@/components/ReorderableList';
-
-import LeftAndRightItemsBar from '@/components/LeftAndRightItemsBar';
+import {
+  DragHandle,
+  dragHandleClassName,
+  ReorderableList
+} from '@/components/ReorderableList';
 
 import theme from '@/themes/default';
 
 import { Field, ValueType } from '@/utils/CYFORM';
 
-function Entry({ name }: { name: string }) {
+import { iota } from '@/utils/tsutils';
+
+function Entry({
+  field,
+  editing,
+  index
+}: {
+  index: number;
+  field: Field;
+  editing: boolean;
+}) {
   return (
-    <Paper elevation={theme.paper.elevation}>
-      <LeftAndRightItemsBar
-        leftContent={[
-          <Typography key={0} variant="body1">
-            {name}
-          </Typography>
-        ]}
-        rightContent={[<DragHandle key={0} />]}
-      />
-    </Paper>
+    <Box
+      className={dragHandleClassName}
+      sx={{
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        width: '100%',
+        margin: theme.spacing.sm,
+        gap: theme.spacing.sm
+      }}
+    >
+      {editing && <DragHandle />}
+      <span>
+        <b>Field #{index + 1}</b>
+      </span>
+      <span>
+        <b>name:</b>&nbsp;
+        {editing ? <TextField defaultValue={field.name} /> : field.name}
+      </span>
+      <span>
+        <b>required:</b>&nbsp;
+        <Checkbox defaultChecked={field.required} disabled={!editing} />
+      </span>
+      <span>
+        <b>nullable:</b>&nbsp;
+        <Checkbox defaultChecked={field.nullable} disabled={!editing} />
+      </span>
+    </Box>
   );
 }
 
@@ -66,10 +101,14 @@ export default function SchemaEditor() {
     }
   ]);
 
+  const [order, setOrder] = useState<number[]>(iota(fields.length));
+
   return (
     <CPanelPage>
       <Stack direction="row" alignItems="center">
-        <Typography variant="h3">Schemas/</Typography>
+        <Typography variant="h3" component="h1">
+          Schemas/
+        </Typography>
         {editing ? (
           <TextField defaultValue={name} />
         ) : (
@@ -78,11 +117,42 @@ export default function SchemaEditor() {
           </Typography>
         )}
       </Stack>
-      <ReorderableList
-        items={fields.map((field, idx) => {
-          return <Entry key={idx} name={field.name} />;
-        })}
+
+      <Divider
+        sx={{
+          mt: theme.spacing.sm,
+          mb: theme.spacing.sm
+        }}
       />
+
+      <Typography variant="h4" component="h2">
+        Fields
+      </Typography>
+
+      {fields.length > 0 ? (
+        <ReorderableList
+          enabled={editing}
+          order={order}
+          setOrder={setOrder}
+          items={fields.map((field, idx) => {
+            return (
+              <Entry
+                key={idx}
+                index={order[idx]}
+                field={field}
+                editing={editing}
+              />
+            );
+          })}
+        />
+      ) : (
+        <Typography variant="body1" component="p">
+          <i>No fields</i>
+        </Typography>
+      )}
+
+      <Button startIcon={<AddIcon />}>New Field</Button>
+
       <Fab
         onClick={() => {
           setEditing(!editing);
@@ -94,7 +164,13 @@ export default function SchemaEditor() {
           margin: theme.spacing.lg
         }}
       >
-        {saving ? <CircularProgress /> : !editing ? <EditIcon /> : <SaveIcon />}
+        {saving ? (
+          <CircularProgress />
+        ) : !editing ? (
+          <EditIcon />
+        ) : (
+          <CheckIcon />
+        )}
       </Fab>
     </CPanelPage>
   );

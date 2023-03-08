@@ -1,10 +1,10 @@
-import { ReactNode, useState } from 'react';
+import { Dispatch, ReactNode, SetStateAction } from 'react';
 
 import DragHandleIcon from '@mui/icons-material/DragHandle';
 
 import { Container, Draggable, OnDropCallback } from 'react-smooth-dnd';
 
-import { iota } from '@/utils/tsutils';
+import { arrayMoveImmutable } from 'array-move';
 
 export function DragHandle() {
   return (
@@ -14,9 +14,19 @@ export function DragHandle() {
   );
 }
 
-export default function ReorderableList({ items }: { items: ReactNode[] }) {
-  const [order, setOrder] = useState<number[]>(iota(items.length));
+export const dragHandleClassName = 'drag-handle';
 
+export default function ReorderableList({
+  items,
+  enabled = true,
+  order,
+  setOrder
+}: {
+  items: ReactNode[];
+  enabled?: boolean;
+  order: number[];
+  setOrder: Dispatch<SetStateAction<number[]>>;
+}) {
   // Create a shallow reordered copy of the items array
   const reorderedItems: ReactNode[] = [];
   for (const i of order) {
@@ -24,18 +34,40 @@ export default function ReorderableList({ items }: { items: ReactNode[] }) {
   }
 
   const onDrop: OnDropCallback = ({ removedIndex, addedIndex }) => {
-    const newOrder = JSON.parse(JSON.stringify(order));
-    newOrder.splice(removedIndex, 1);
-    newOrder.splice(addedIndex, 0, removedIndex);
+    const newOrder = arrayMoveImmutable(
+      order,
+      removedIndex ?? 0,
+      addedIndex ?? 0
+    );
     setOrder(newOrder);
   };
 
-  return (
-    <Container dragHandleSelector=".drag-handle" lockAxis="y" onDrop={onDrop}>
+  return enabled ? (
+    // Ignore due to an error in the react-smooth-dnd library
+    // See: https://github.com/kutlugsahin/react-smooth-dnd/issues/88
+    // @ts-ignore
+    <Container
+      dragHandleSelector=".drag-handle"
+      lockAxis="y"
+      onDrop={onDrop}
+      style={{ width: '100%' }}
+    >
       {reorderedItems.map((item, index) => {
+        // Ignore due to an error in the react-smooth-dnd library
+        // See: https://github.com/kutlugsahin/react-smooth-dnd/issues/88
+        // @ts-ignore
         return <Draggable key={index}>{item}</Draggable>;
       })}
     </Container>
+  ) : (
+    <div style={{ width: '100%' }}>
+      {reorderedItems.map((item, index) => {
+        // Ignore due to an error in the react-smooth-dnd library
+        // See: https://github.com/kutlugsahin/react-smooth-dnd/issues/88
+        // @ts-ignore
+        return <div key={index}>{item}</div>;
+      })}
+    </div>
   );
 }
 

@@ -18,11 +18,11 @@ export default function LeftAndRightItemsBar({
   return (
     <Box
       sx={{
-        width: '100%',
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
-        padding: padding
+        padding: padding,
+        spacing: spacing
       }}
     >
       <Box
