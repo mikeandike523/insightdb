@@ -3,19 +3,19 @@ import { useRouter } from 'next/router';
 import { ReactNode, useState } from 'react';
 
 import {
-  AppBar,
-  Box,
-  Breadcrumbs,
-  Button,
-  Divider,
-  Drawer,
-  IconButton,
-  Link,
-  List,
-  ListItem,
-  ListItemButton,
-  Toolbar,
-  Typography
+    AppBar,
+    Box,
+    Breadcrumbs,
+    Button,
+    Divider,
+    Drawer,
+    IconButton,
+    Link,
+    List,
+    ListItem,
+    ListItemButton,
+    Toolbar,
+    Typography
 } from '@mui/material';
 
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
@@ -72,7 +72,10 @@ export default function Navbar({
     {
       vertical: 'bottom',
       horizontal: 'right'
-    }
+    },
+    undefined,
+    undefined,
+    theme.spacing.sm
   );
 
   return (

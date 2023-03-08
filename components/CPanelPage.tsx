@@ -21,8 +21,8 @@ export default function CPanelPage({
             href: '/dashboard'
           },
           {
-            label: 'Schema Editor',
-            href: '/schema-editor'
+            label: 'Schemas and Tables',
+            href: '/schemas-and-tables'
           },
           ...(process.env.NODE_ENV === 'development'
             ? [

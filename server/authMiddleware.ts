@@ -6,7 +6,7 @@ import { UnauthorizedError, UserFacingError } from '@/types/UserFacingError';
 
 import {
   KeyError,
-  recordInverseSubset,
+  recordSubset,
   SerializableRecord,
   serializableRecordStrictlyMatches,
   TreeAccess
@@ -34,8 +34,14 @@ export const authMiddleware = middleware(async ({ ctx, next }) => {
       token,
       getEnvStrict('JWT_SECRET')
     ) as SerializableRecord;
-    claims = recordInverseSubset(claims, ['expiresIn']);
-    user = recordInverseSubset(user, ['token']);
+    claims = recordSubset(claims, [
+      'uuid',
+      'name',
+      'email',
+      'title',
+      'orgName'
+    ]);
+    user = recordSubset(user, ['uuid', 'name', 'email', 'title', 'orgName']);
     if (!serializableRecordStrictlyMatches(claims, user)) {
       throw new UserFacingError(
         new UnauthorizedError('JWT claims mismatch data in session.user.')

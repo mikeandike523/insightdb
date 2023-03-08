@@ -90,7 +90,8 @@ export const userRouter = router({
         user.password AS password,
         user.title AS title,
         user.name AS name,
-        user.orgname AS orgName
+        user.orgName AS orgName,
+        user.uuid AS uuid
       
       `,
         {
@@ -158,6 +159,10 @@ export const userRouter = router({
       name: claims.name,
       orgName: claims.orgName
     };
+  }),
+  signout: procedure.mutation(async ({ ctx }) => {
+    ctx.session.destroy();
+    ctx.session.commit();
   }),
   me: procedure.query(async ({ ctx }) => {
     if (process.env.NODE_ENV !== 'development') {

@@ -4,6 +4,8 @@
  * A type-safe ORM solution for CYPHER powered graph databases
  */
 
+import { Connection, type Procedure } from '@/utils/neo4j';
+
 function hasExtraKeys(obj: { [key: string]: any }, keys: string[]): boolean {
   const objKeys = Object.keys(obj);
   const allowedKeys = new Set(keys);
@@ -176,7 +178,7 @@ function validateField(field: Field) {
 type SchemaOptionValue = string | number | boolean | Date | null; // Not sure what types of options there will be yet. For now, this union type will do.
 
 // For now, schemas will be saved as JSON in database, and data will have the hierarchical structure. That is why Schema does not currently have owner or name fields
-class Schema {
+export class Schema {
   fields: Field[] = [];
   strict: boolean;
   constructor(
@@ -273,9 +275,24 @@ class Schema {
     schema.fields = obj.fields;
     return schema;
   }
+  async saveTo(owner: string) {
+    const connection = new Connection();
+    const procedure: Procedure = async (tx) => {
+      await tx.run(
+        `
+        MERGE (schema:Schema {owner:$owner, stringified:$stringified})
+      `,
+        {
+          owner: owner,
+          stringified: this.toJSON()
+        }
+      );
+    };
+    await connection.withWriter(procedure);
+  }
 }
 
-class CYFORMObject {
+export class CYFORMObject {
   owner: string;
   schema: Schema;
   data: FieldValues;

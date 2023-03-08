@@ -4,6 +4,8 @@ import { useRouter } from 'next/router';
 
 import { Menu, MenuItem } from '@mui/material';
 
+export type ClickHandler = (event: MouseEvent<HTMLElement>) => void;
+
 export function usePopoverMenu(
   entries: {
     label: string;
@@ -16,7 +18,9 @@ export function usePopoverMenu(
   transformOrigin?: {
     vertical: number | 'top' | 'bottom' | 'center';
     horizontal: number | 'left' | 'right';
-  }
+  },
+  raise = '0px',
+  lower = '0px'
 ): [JSX.Element, (evt: MouseEvent<HTMLElement>) => void] {
   const router = useRouter();
 
@@ -42,6 +46,9 @@ export function usePopoverMenu(
       }
       onClose={() => {
         setAnchorEl(null);
+      }}
+      sx={{
+        marginTop: raise !== '0px' ? '-' + raise : lower
       }}
     >
       {entries.map((entry, index) => {

@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 
 import { useGlobalState } from '@/utils/GlobalState';
 
+
 export default function Signout() {
   const router = useRouter();
   const globalState = useGlobalState();
