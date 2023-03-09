@@ -178,6 +178,7 @@ export default function SchemaEditor() {
   console.log('order', order);
 
   const handleSave = async () => {
+    setEditing(false);
     setSaving(true);
     try {
       // Simulate saving for demo purposes
@@ -287,7 +288,7 @@ export default function SchemaEditor() {
               >
                 <EditIcon />
               </Fab>
-              <Fab>
+              <Fab onClick={handleSave}>
                 <SaveIcon />
               </Fab>
             </>
