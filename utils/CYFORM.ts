@@ -4,6 +4,10 @@
  * A type-safe ORM solution for CYPHER powered graph databases
  */
 
+import {
+  SerializableObject,
+  SerializableRecord
+} from '@/types/SerializableObject';
 import { Connection, type Procedure } from '@/utils/neo4j';
 
 function hasExtraKeys(obj: { [key: string]: any }, keys: string[]): boolean {
@@ -213,6 +217,7 @@ type SchemaOptionValue = string | number | boolean | Date | null; // Not sure wh
 export class Schema {
   fields: Field[] = [];
   strict: boolean;
+  uuid = ''; // Used to save a overwrite an already saved schema
   constructor(
     shorthand: { [name: string]: ShorthandField },
     options: {
@@ -295,32 +300,69 @@ export class Schema {
       return new CYFORMObject(owner, this, data);
     };
   }
-  toJSON() {
-    return JSON.stringify({
-      strict: this.strict,
-      fields: this.fields
-    });
-  }
-  static fromJSON(json: string): Schema {
-    const obj: any = JSON.parse(json);
-    const schema = new Schema({}, { strict: obj.strict });
-    schema.fields = obj.fields;
-    return schema;
-  }
-  async saveTo(owner: string) {
+  async saveTo(owner: string, name: string): Promise<SerializableObject> {
     const connection = new Connection();
+
     const procedure: Procedure = async (tx) => {
-      await tx.run(
-        `
-        MERGE (schema:Schema {owner:$owner, stringified:$stringified})
-      `,
-        {
-          owner: owner,
-          stringified: this.toJSON()
-        }
-      );
+      if (this.uuid) {
+        await tx.run(
+          `
+          MERGE (schema:Schema {
+            uuid: $uuid
+            name: $name,
+          })-[:BELONGS_TO]->(user:PrincipalUser {uuid: $owner})
+          RETURN schema.uuid AS uuid
+        `,
+          {
+            name: name,
+            owner: owner,
+            uuid: this.uuid
+          }
+        );
+      } else {
+        const response = await tx.run(
+          `
+          MERGE (schema:Schema {
+            uuid: apoc.create.uuid()
+            name: $name,
+          })-[:BELONGS_TO]->(user:PrincipalUser {uuid: $owner})
+          RETURN schema.uuid AS uuid
+        `,
+          {
+            name: name,
+            owner: owner
+          }
+        );
+        this.uuid = (response as SerializableRecord[])[0].uuid as string;
+      }
+      for (let i = 0; i < this.fields.length; i++) {
+        const field = this.fields[i];
+        await tx.run(
+          `
+          MERGE (field:SchemaField {
+            index: $index,
+            name: $name,
+            type: $type,
+            required: $required,
+            nullable: $nullable,
+          })-[:IS_COMPONENT_OF]->(schema:Schema {uuid: $schemaUuid})
+          RETURN field.uuid AS uuid
+        `,
+          {
+            index: i,
+            name: field.name,
+            type: field.type,
+            required: field.required,
+            nullable: field.nullable,
+            schemaUuid: this.uuid
+          }
+        );
+      }
+
+      return true;
     };
-    await connection.withWriter(procedure);
+
+    return (await connection.withWriter(procedure)) as SerializableObject;
   }
 }
 
@@ -334,20 +376,7 @@ export class CYFORMObject {
     this.schema = schema;
     this.data = data;
   }
-  toJSON() {
-    return JSON.stringify({
-      owner: this.owner,
-      schema: this.schema.toJSON(),
-      data: this.data
-    });
-  }
-  static fromJSON(json: string): CYFORMObject {
-    const obj = JSON.parse(json);
-    const schema = Schema.fromJSON(obj.schema);
-    const owner = obj.owner;
-    const data = obj.data;
-    return new CYFORMObject(owner, schema, data);
-  }
+
   async save() {
     // not yet implemented
   }

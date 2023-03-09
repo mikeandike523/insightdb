@@ -177,6 +177,17 @@ export default function SchemaEditor() {
 
   console.log('order', order);
 
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      // Simulate saving for demo purposes
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+    } catch (e: unknown) {
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <CPanelPage>
       <Stack direction="row" alignItems="center">
