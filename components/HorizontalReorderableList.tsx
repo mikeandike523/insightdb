@@ -6,6 +6,10 @@ import { Container, Draggable, OnDropCallback } from 'react-smooth-dnd';
 
 import { arrayMoveImmutable } from 'array-move';
 
+import theme from '@/themes/default';
+
+import useRerender from '@/hooks/useRerender';
+
 export function DragHandle() {
   return (
     <span className="drag-handle">
@@ -16,7 +20,7 @@ export function DragHandle() {
 
 export const dragHandleClassName = 'drag-handle';
 
-export default function ReorderableList({
+export default function HorizontalReorderableList({
   items,
   enabled = true,
   order,
@@ -27,11 +31,7 @@ export default function ReorderableList({
   order: number[];
   setOrder: Dispatch<SetStateAction<number[]>>;
 }) {
-  // Create a shallow reordered copy of the items array
-  const reorderedItems: ReactNode[] = [];
-  for (const i of order) {
-    reorderedItems.push(items[i]);
-  }
+  const rerender = useRerender();
 
   const onDrop: OnDropCallback = ({ removedIndex, addedIndex }) => {
     const newOrder = arrayMoveImmutable(
@@ -39,7 +39,9 @@ export default function ReorderableList({
       removedIndex ?? 0,
       addedIndex ?? 0
     );
+    console.log(order, newOrder);
     setOrder(newOrder);
+    rerender();
   };
 
   return enabled ? (
@@ -48,20 +50,41 @@ export default function ReorderableList({
     // @ts-ignore
     <Container
       dragHandleSelector=".drag-handle"
-      lockAxis="y"
+      lockAxis="x"
       onDrop={onDrop}
-      style={{ width: '100%' }}
+      style={{
+        display: 'flex',
+        width: '100%',
+        justifyContent: 'left',
+        gap: theme.spacing.md
+      }}
+      orientation="horizontal"
     >
-      {reorderedItems.map((item, index) => {
+      {items.map((item, index) => {
         // Ignore due to an error in the react-smooth-dnd library
         // See: https://github.com/kutlugsahin/react-smooth-dnd/issues/88
         // @ts-ignore
-        return <Draggable key={index}>{item}</Draggable>;
+        return (
+          // Ignore due to an error in the react-smooth-dnd library
+          // See: https://github.com/kutlugsahin/react-smooth-dnd/issues/88
+          // @ts-ignore
+          <Draggable style={{}} key={index}>
+            {item}
+          </Draggable>
+        );
       })}
     </Container>
   ) : (
-    <div style={{ width: '100%' }}>
-      {reorderedItems.map((item, index) => {
+    <div
+      style={{
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'top',
+        gap: theme.spacing.md
+      }}
+    >
+      {items.map((item, index) => {
         // Ignore due to an error in the react-smooth-dnd library
         // See: https://github.com/kutlugsahin/react-smooth-dnd/issues/88
         // @ts-ignore
@@ -71,4 +94,4 @@ export default function ReorderableList({
   );
 }
 
-export { ReorderableList };
+export { HorizontalReorderableList };

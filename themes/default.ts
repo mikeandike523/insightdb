@@ -29,6 +29,11 @@ const theme: any = {
   },
   paper: {
     elevation: 3
+  },
+  card: {
+    width: {
+      md: '200px'
+    }
   }
 };
 

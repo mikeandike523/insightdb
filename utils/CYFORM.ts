@@ -44,8 +44,40 @@ export enum ValueType {
   STRING = 'string',
   NUMBER = 'number',
   BOOLEAN = 'boolean',
-  DATE = 'Date',
+  DATE = 'date',
   NULL = 'null'
+}
+
+export function stringToValueType(s: string): ValueType {
+  switch (s.toLowerCase()) {
+    case 'string':
+      return ValueType.STRING;
+    case 'number':
+      return ValueType.NUMBER;
+    case 'boolean':
+      return ValueType.BOOLEAN;
+    case 'date':
+      return ValueType.DATE;
+    default:
+      throw new Error(`Unknown value type: ${s}`);
+  }
+}
+
+export function ValueTypeToString(t: ValueType): string {
+  switch (t) {
+    case ValueType.STRING:
+      return 'string';
+    case ValueType.NUMBER:
+      return 'number';
+    case ValueType.BOOLEAN:
+      return 'boolean';
+    case ValueType.DATE:
+      return 'date';
+    case ValueType.NULL:
+      return 'null';
+    default:
+      throw new Error(`Unknown value type: ${t}`);
+  }
 }
 
 export type Field = {
